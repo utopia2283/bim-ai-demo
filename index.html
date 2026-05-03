@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BIM AI Submission Copilot Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">BA</div>
+          <div>
+            <strong>BIM AI Copilot</strong>
+            <span>Hong Kong Submission Demo</span>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="Demo sections">
+          <button class="nav-btn active" data-view="dashboard" title="Dashboard">
+            <span class="icon">▦</span>
+            <span>總覽</span>
+          </button>
+          <button class="nav-btn" data-view="issues" title="Issues">
+            <span class="icon">!</span>
+            <span>模型問題</span>
+          </button>
+          <button class="nav-btn" data-view="assistant" title="AI Assistant">
+            <span class="icon">?</span>
+            <span>AI 助理</span>
+          </button>
+          <button class="nav-btn" data-view="funding" title="Funding">
+            <span class="icon">$</span>
+            <span>Funding</span>
+          </button>
+          <button class="nav-btn" data-view="roadmap" title="Roadmap">
+            <span class="icon">↗</span>
+            <span>開發評估</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-note">
+          <span>Demo mode</span>
+          <strong>IFC / Revit mock scan</strong>
+          <p>展示用資料，適合明天向建築公司說明產品流程、價值和 pilot 預算。</p>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">香港建築公司 AI + BIM pilot proposal</p>
+            <h1>BIM Submission Readiness & Compliance Copilot</h1>
+          </div>
+          <div class="top-actions">
+            <button class="ghost-btn" id="loadSampleBtn">載入 sample model</button>
+            <button class="primary-btn" id="runScanBtn">Run BIM AI Scan</button>
+          </div>
+        </header>
+
+        <section class="upload-band" aria-label="Model upload">
+          <div class="drop-zone" id="dropZone">
+            <input id="fileInput" type="file" accept=".ifc,.rvt,.nwc,.json" />
+            <div>
+              <strong id="fileName">HK Residential Tower - Sample.ifc</strong>
+              <span>拖入 IFC / Revit export，或直接用 sample model 做演示</span>
+            </div>
+          </div>
+          <div class="scan-status">
+            <span id="scanLabel">Ready</span>
+            <div class="progress">
+              <div id="progressBar"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view active" id="dashboard">
+          <div class="dashboard-grid">
+            <section class="model-panel">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">3D issue heatmap</p>
+                  <h2>Model Risk View</h2>
+                </div>
+                <span class="pill warning">7 critical</span>
+              </div>
+              <canvas id="modelCanvas" width="860" height="560" aria-label="BIM model risk visual"></canvas>
+              <div class="legend">
+                <span><i class="ok"></i>Ready</span>
+                <span><i class="warn"></i>Missing property</span>
+                <span><i class="bad"></i>Submission blocker</span>
+              </div>
+            </section>
+
+            <section class="score-panel">
+              <div class="score-ring">
+                <svg viewBox="0 0 120 120" role="img" aria-label="Readiness score">
+                  <circle cx="60" cy="60" r="48" class="track"></circle>
+                  <circle cx="60" cy="60" r="48" class="meter" id="scoreMeter"></circle>
+                </svg>
+                <div>
+                  <strong id="scoreValue">68</strong>
+                  <span>/100</span>
+                </div>
+              </div>
+              <h2>Submission Readiness</h2>
+              <p>模型可提交程度中等。主要風險集中於 fire compartment、sanitary fitment data、IFC property set 和 element classification。</p>
+
+              <div class="metric-list">
+                <div>
+                  <span>Elements scanned</span>
+                  <strong>18,420</strong>
+                </div>
+                <div>
+                  <span>Rules checked</span>
+                  <strong>46</strong>
+                </div>
+                <div>
+                  <span>Issues found</span>
+                  <strong>126</strong>
+                </div>
+                <div>
+                  <span>Estimated rework saved</span>
+                  <strong>92 hrs</strong>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="summary-row">
+            <article>
+              <span class="tag bad">Blocker</span>
+              <strong>BD automated checking 前置預檢</strong>
+              <p>找出 submission tool 可能拒收的 geometry / data issue，先在內部修正。</p>
+            </article>
+            <article>
+              <span class="tag warn">Gap</span>
+              <strong>CIC / ISO 19650 data quality</strong>
+              <p>檢查 naming、classification、property set、LOD-I 和 responsibility matrix。</p>
+            </article>
+            <article>
+              <span class="tag ok">Business</span>
+              <strong>Funding-ready pilot</strong>
+              <p>8-12 星期交付 pilot，可包裝成 CITF adoption + ESS R&D 雙軌方案。</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="issues">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">AI generated issue register</p>
+              <h2>Submission Blockers</h2>
+            </div>
+            <div class="filter-tabs" role="tablist">
+              <button class="tab active" data-severity="all">All</button>
+              <button class="tab" data-severity="critical">Critical</button>
+              <button class="tab" data-severity="major">Major</button>
+              <button class="tab" data-severity="minor">Minor</button>
+            </div>
+          </div>
+          <div class="issue-table" id="issueTable"></div>
+        </section>
+
+        <section class="view" id="assistant">
+          <div class="assistant-layout">
+            <section class="chat-panel">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">RAG assistant demo</p>
+                  <h2>Ask BIM AI</h2>
+                </div>
+              </div>
+              <div class="quick-prompts">
+                <button data-question="這個模型是否可以做 BD BIM submission？">可否提交？</button>
+                <button data-question="明天怎樣向客戶解釋 ROI？">ROI 點講？</button>
+                <button data-question="我們應該申請什麼 funding？">Funding 建議</button>
+              </div>
+              <div class="chat-log" id="chatLog">
+                <div class="message ai">
+                  <strong>BIM AI</strong>
+                  <p>我已讀取 sample model、香港 BIM policy 摘要和 pilot scope。你可以問 submission readiness、funding、開發難度或明天 pitch 話術。</p>
+                </div>
+              </div>
+              <form class="chat-input" id="chatForm">
+                <input id="chatInput" type="text" placeholder="輸入問題，例如：MVP 要做幾耐？" />
+                <button type="submit">Send</button>
+              </form>
+            </section>
+
+            <section class="citation-panel">
+              <h2>Knowledge Base</h2>
+              <div class="source">
+                <strong>DEVB BIM Circular</strong>
+                <p>公共工程 3,000 萬港元以上項目強制使用 BIM。</p>
+              </div>
+              <div class="source">
+                <strong>DEVB BIM Roadmap</strong>
+                <p>2026 起大型私人住宅先行，2029 目標私營界全面 BIM submission。</p>
+              </div>
+              <div class="source">
+                <strong>CIC Year of AI 2026</strong>
+                <p>AI + safety、design optimisation、quality inspection、lifecycle management。</p>
+              </div>
+              <div class="source">
+                <strong>CITF / ESS</strong>
+                <p>CITF 支持 adoption；ESS 支持本地 R&D，最高 HK$10M，1:1 matching。</p>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="funding">
+          <div class="funding-grid">
+            <section>
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Budget simulator</p>
+                  <h2>Pilot Funding Model</h2>
+                </div>
+              </div>
+              <label class="slider-row">
+                <span>Pilot budget</span>
+                <strong id="budgetLabel">HK$480,000</strong>
+                <input id="budgetSlider" type="range" min="180000" max="1200000" step="30000" value="480000" />
+              </label>
+              <div class="funding-cards">
+                <article>
+                  <span>CITF adoption angle</span>
+                  <strong id="citfValue">HK$336,000</strong>
+                  <p>以 70% matching 作示範估算，實際要視申請類別和批核。</p>
+                </article>
+                <article>
+                  <span>Client cash estimate</span>
+                  <strong id="clientValue">HK$144,000</strong>
+                  <p>適合作為第一個共同 pilot，降低客戶決策阻力。</p>
+                </article>
+                <article>
+                  <span>ESS R&D route</span>
+                  <strong>Up to HK$10M</strong>
+                  <p>由你的 AI 公司申請，適合做 IFC rule engine、RAG、Revit plugin。</p>
+                </article>
+              </div>
+            </section>
+
+            <section class="pitch-panel">
+              <p class="eyebrow">Talk track</p>
+              <h2>明天 90 秒講法</h2>
+              <p id="pitchText">我們建議先做一個 BIM AI Submission Readiness Pilot，不是做 general chatbot。8-12 星期內，用你們一個真實項目測試 IFC / Revit model，AI 自動找出 BD submission、CIC data quality、ISO 19650 handover 相關風險，輸出 issue register 和修正建議。這個 pilot 可以用 CITF 包裝 adoption，你們取得內部效率，我們一起建立香港市場 case，再用 ESS 做 R&D 擴展成正式產品。</p>
+              <button class="ghost-btn" id="copyPitchBtn">複製 pitch</button>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="roadmap">
+          <div class="roadmap-grid">
+            <section>
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Feasibility assessment</p>
+                  <h2>開發難度與預算</h2>
+                </div>
+              </div>
+              <div class="difficulty-list">
+                <div>
+                  <strong>Demo / clickable prototype</strong>
+                  <span>1-3 日｜HK$0-20k｜低難度</span>
+                  <p>用 vibe coding 可以做到，適合見客、pitch、收需求。</p>
+                </div>
+                <div>
+                  <strong>MVP: IFC checker + AI report</strong>
+                  <span>8-12 星期｜HK$250k-650k｜中等難度</span>
+                  <p>需要 IfcOpenShell、rule engine、RAG、PDF/BCF report，不一定要即時 Revit plugin。</p>
+                </div>
+                <div>
+                  <strong>Production: Revit plugin + CDE + audit trail</strong>
+                  <span>6-9 個月｜HK$1.5M-4M｜高難度</span>
+                  <p>需要 BIM engineer、full-stack、LLM engineer、security、客戶真實項目測試。</p>
+                </div>
+                <div>
+                  <strong>Regulatory-grade checker</strong>
+                  <span>12-24 個月｜HK$5M-15M+｜很高難度</span>
+                  <p>需要專業顧問、法規維護、模型邊界案例、責任條款，不應作第一階段承諾。</p>
+                </div>
+              </div>
+            </section>
+
+            <section>
+              <p class="eyebrow">Recommended MVP scope</p>
+              <h2>12-week build plan</h2>
+              <ol class="timeline">
+                <li><strong>Week 1-2</strong><span>收 sample model、定 30-50 條 checking rules、整理香港 guideline knowledge base。</span></li>
+                <li><strong>Week 3-5</strong><span>IFC parser、data quality engine、issue classification、element ID mapping。</span></li>
+                <li><strong>Week 6-8</strong><span>AI assistant、citation answer、HTML/PDF/CSV/BCF report。</span></li>
+                <li><strong>Week 9-10</strong><span>客戶項目測試、BIM manager feedback、rule tuning。</span></li>
+                <li><strong>Week 11-12</strong><span>pilot report、ROI analysis、funding proposal package。</span></li>
+              </ol>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
